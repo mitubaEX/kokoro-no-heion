@@ -1,0 +1,145 @@
+.med-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.option-group .label {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+
+.pattern-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pattern {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.pattern.active {
+  border-color: var(--accent);
+  background: rgba(139, 157, 255, 0.12);
+}
+.pattern .pname {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.pattern .pdesc {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.duration-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bg-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.86rem;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.bg-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+/* ── 実行中の画面 ── */
+.med-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 0 8px;
+  min-height: 60vh;
+  justify-content: center;
+}
+
+.breath-wrap {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: grid;
+  place-items: center;
+}
+
+.breath-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(139, 157, 255, 0.35),
+    rgba(106, 211, 196, 0.12) 60%,
+    transparent 72%
+  );
+  transform: scale(0.45);
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+  will-change: transform;
+  box-shadow: 0 0 80px rgba(139, 157, 255, 0.25);
+}
+.breath-ring::after {
+  content: '';
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.breath-center {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.breath-phase {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.breath-count {
+  font-size: 0.9rem;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.session-readout {
+  font-size: 0.86rem;
+  color: var(--text-dim);
+}
+.session-readout .mono {
+  color: var(--accent-2);
+}
+
+.med-done {
+  text-align: center;
+  padding: 40px 0;
+}
+.med-done .big {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+/* ── モーション配慮 ── */
+/* 呼吸の輪は「動き」が本質だが、reduced-motion 設定時は拡大縮小を止め、
+   テキスト（吸う/止める/吐く＋カウント）での誘導に任せる。
+   インラインの transform: scale(...) を上書きし、輪を一定サイズで静止させる。
+   フェーズと残り秒は引き続き数値で表示されるため、誘導は維持される。 */
+@media (prefers-reduced-motion: reduce) {
+  .breath-ring {
+    transition: none !important;
+    transform: scale(0.8) !important;
+  }
+}

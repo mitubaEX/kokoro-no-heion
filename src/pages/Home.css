@@ -1,0 +1,108 @@
+.greeting {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.greeting-sub {
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  margin-bottom: 22px;
+}
+
+.quote-card {
+  position: relative;
+  margin-bottom: 22px;
+  padding: 26px 22px;
+  background:
+    linear-gradient(135deg, rgba(139, 157, 255, 0.16), rgba(106, 211, 196, 0.1)),
+    var(--surface);
+}
+.quote-card .quote-mark {
+  font-size: 2.4rem;
+  line-height: 0;
+  color: var(--accent);
+  opacity: 0.5;
+}
+.quote-card .quote-text {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--text);
+  margin-top: 8px;
+}
+.quote-card .quote-label {
+  margin-top: 14px;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--text-faint);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.action {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+.action:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 157, 255, 0.5);
+}
+.action .a-ico {
+  font-size: 1.8rem;
+}
+.action .a-title {
+  font-weight: 600;
+}
+.action .a-desc {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+  line-height: 1.6;
+}
+
+/* ── あなたへのおすすめ ── */
+.recommend {
+  margin-bottom: 22px;
+}
+.recommend .rec-head {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.recommend .actions {
+  margin-bottom: 0;
+}
+.recommend .rec-note {
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  line-height: 1.6;
+}
+
+.upcoming {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── モーション配慮 ── */
+@media (prefers-reduced-motion: reduce) {
+  /* カードの浮き上がりを無効化（枠色の変化は維持） */
+  .action:hover {
+    transform: none;
+  }
+}

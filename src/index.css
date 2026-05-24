@@ -1,0 +1,333 @@
+:root {
+  /* Palette — 夜空のように落ち着いた色合い */
+  --bg-0: #0f1124;
+  --bg-1: #161a36;
+  --bg-2: #1d2247;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-strong: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.1);
+
+  --text: #eef0fb;
+  --text-dim: #b3b8d8;
+  --text-faint: #7c82a8;
+
+  --accent: #8b9dff;
+  --accent-2: #6ad3c4;
+  --accent-warm: #f0b5a0;
+
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  --radius: 20px;
+  --radius-sm: 12px;
+
+  --maxw: 720px;
+
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  color: var(--text);
+  background:
+    radial-gradient(1200px 800px at 20% -10%, #2a2f63 0%, transparent 55%),
+    radial-gradient(1000px 700px at 110% 10%, #1c3b46 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  background-attachment: fixed;
+  min-height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ---- Focus visibility (keyboard) ---- */
+/* キーボード操作時のみフォーカスリングを表示し、
+   マウスクリック時に出っぱなしにならないよう :focus-visible を使用 */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.chip:focus-visible,
+.nav a:focus-visible,
+input:focus-visible,
+input[type="range"]:focus-visible,
+input[type="checkbox"]:focus-visible,
+label:focus-visible,
+[tabindex]:focus-visible,
+.scape:focus-visible,
+.action:focus-visible,
+.pattern:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+/* range のつまみにフォーカスが移ったときも分かりやすく */
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--accent);
+}
+input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--text-dim);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-0);
+}
+
+/* ---- App shell ---- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.content {
+  flex: 1;
+  padding: 28px 0 110px;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Top brand ---- */
+.brand {
+  padding: 22px 0 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.brand .logo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.brand .sub {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ---- Card ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+/* ---- Bottom nav ---- */
+.nav {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+  width: calc(100% - 32px);
+  max-width: calc(var(--maxw) - 16px);
+  display: flex;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(18, 21, 44, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  z-index: 50;
+}
+.nav a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  color: var(--text-faint);
+  font-size: 0.66rem;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.nav a .ico {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.nav a.active {
+  color: var(--text);
+  background: var(--surface-strong);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease, background 0.2s ease, opacity 0.2s ease;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #0c1024;
+  font-weight: 600;
+  border: none;
+}
+.btn-primary:hover {
+  opacity: 0.92;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Range input ---- */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg-0);
+  box-shadow: 0 0 0 1px var(--accent);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg-0);
+  cursor: pointer;
+}
+
+/* ---- Section heading ---- */
+.section-title {
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+.section-lead {
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  margin-bottom: 20px;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.spread {
+  justify-content: space-between;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+}
+.muted {
+  color: var(--text-faint);
+}
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Motion preferences ---- */
+/* prefers-reduced-motion: reduce 時は、装飾的なアニメーション・トランジションを
+   無効化/最小化する。見た目（最終状態）は維持し、動きだけを抑える。
+   呼吸ガイドの拡大縮小は Meditation.css 側で別途無効化し、
+   テキスト（吸う/止める/吐く＋カウント）で誘導できるようにする。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* fade-in は最終状態（不透明・移動なし）で表示 */
+  .content {
+    animation: none;
+  }
+
+  /* hover での浮き上がりや押下スケールを止める */
+  .btn:active {
+    transform: none;
+  }
+}

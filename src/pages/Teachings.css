@@ -1,0 +1,73 @@
+.theme-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.teaching-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.teaching {
+  position: relative;
+  overflow: hidden;
+}
+.teaching::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    160px 160px at 90% -20%,
+    rgba(139, 157, 255, 0.18),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.teaching .quote-mark {
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.55;
+  margin-bottom: 2px;
+}
+
+.teaching .t-text {
+  font-size: 1.04rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.teaching .t-source {
+  font-size: 0.82rem;
+  color: var(--accent-2);
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+
+.teaching .t-note {
+  font-size: 0.86rem;
+  line-height: 1.8;
+  color: var(--text-dim);
+  border-left: 2px solid var(--border);
+  padding-left: 14px;
+  margin-bottom: 14px;
+}
+
+.teaching .t-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.t-footnote {
+  margin-top: 24px;
+  font-size: 0.74rem;
+  line-height: 1.8;
+  color: var(--text-faint);
+  text-align: center;
+}

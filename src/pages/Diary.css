@@ -1,0 +1,177 @@
+/* ── 今日の記録エディタ ── */
+.diary-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.diary-today {
+  font-size: 0.82rem;
+  color: var(--accent-2);
+  letter-spacing: 0.02em;
+}
+
+.mood-label {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+/* 気分セレクタ（5 段階の絵文字） */
+.mood-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: -4px;
+}
+
+.mood-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.mood-option:hover {
+  transform: translateY(-2px);
+}
+.mood-option.active {
+  border-color: var(--accent);
+  background: var(--surface-strong);
+}
+.mood-option .mood-emoji {
+  font-size: 1.7rem;
+  line-height: 1;
+  filter: grayscale(0.5);
+  opacity: 0.7;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.mood-option.active .mood-emoji {
+  filter: none;
+  opacity: 1;
+}
+.mood-option .mood-name {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+}
+.mood-option.active .mood-name {
+  color: var(--text-dim);
+}
+
+@media (max-width: 380px) {
+  .mood-option .mood-name {
+    display: none;
+  }
+}
+
+/* ひとことメモ */
+.diary-note {
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.diary-note::placeholder {
+  color: var(--text-faint);
+}
+.diary-note:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 保存ボタン行＋完了表示 */
+.diary-save-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.diary-saved {
+  font-size: 0.82rem;
+  color: var(--accent-2);
+  animation: fade-in 0.3s ease;
+}
+
+/* プライバシー注記 */
+.diary-privacy {
+  font-size: 0.74rem;
+  line-height: 1.7;
+  color: var(--text-faint);
+  margin-bottom: 28px;
+}
+
+/* ── 過去の記録一覧 ── */
+.diary-list-title {
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.diary-empty {
+  font-size: 0.86rem;
+  color: var(--text-faint);
+}
+
+.diary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diary-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.diary-entry-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.diary-entry-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.diary-entry-date {
+  flex: 1;
+  font-size: 0.84rem;
+  color: var(--text-dim);
+}
+.diary-delete {
+  font-size: 0.95rem;
+  opacity: 0.55;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+.diary-delete:hover {
+  opacity: 1;
+  background: var(--surface-strong);
+}
+.diary-entry-note {
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── モーション配慮 ── */
+@media (prefers-reduced-motion: reduce) {
+  .mood-option:hover {
+    transform: none;
+  }
+  .diary-saved {
+    animation: none;
+  }
+}

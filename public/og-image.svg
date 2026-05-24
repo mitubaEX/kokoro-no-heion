@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="心の平穏 — Kokoro no Heion">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#1d2247"/>
+      <stop offset="0.55" stop-color="#161a36"/>
+      <stop offset="1" stop-color="#0f1124"/>
+    </linearGradient>
+    <radialGradient id="glowL" cx="18%" cy="-10%" r="70%">
+      <stop offset="0" stop-color="#2a2f63" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#2a2f63" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowR" cx="105%" cy="12%" r="60%">
+      <stop offset="0" stop-color="#1c3b46" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#1c3b46" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="moon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b9dff"/>
+      <stop offset="1" stop-color="#6ad3c4"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#eef0fb"/>
+      <stop offset="1" stop-color="#cdd3f6"/>
+    </linearGradient>
+    <mask id="crescent">
+      <rect width="1200" height="630" fill="#000"/>
+      <circle cx="318" cy="315" r="118" fill="#fff"/>
+      <circle cx="362" cy="278" r="106" fill="#000"/>
+    </mask>
+  </defs>
+
+  <!-- 夜空グラデ -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glowL)"/>
+  <rect width="1200" height="630" fill="url(#glowR)"/>
+
+  <!-- 星 -->
+  <g fill="#eef0fb">
+    <circle cx="540" cy="92" r="2.6" fill-opacity="0.9"/>
+    <circle cx="690" cy="150" r="1.8" fill-opacity="0.7"/>
+    <circle cx="980" cy="120" r="2.2" fill-opacity="0.8"/>
+    <circle cx="1080" cy="240" r="1.6" fill-opacity="0.6"/>
+    <circle cx="860" cy="520" r="2" fill-opacity="0.7"/>
+    <circle cx="1130" cy="470" r="1.5" fill-opacity="0.55"/>
+    <circle cx="470" cy="560" r="1.8" fill-opacity="0.6"/>
+    <circle cx="150" cy="540" r="1.6" fill-opacity="0.5"/>
+    <circle cx="620" cy="470" r="1.4" fill-opacity="0.5"/>
+  </g>
+
+  <!-- シンボルマーク（三日月＋同心円） -->
+  <g>
+    <circle cx="318" cy="315" r="208" fill="none" stroke="#8b9dff" stroke-opacity="0.12" stroke-width="3"/>
+    <circle cx="318" cy="315" r="168" fill="none" stroke="#6ad3c4" stroke-opacity="0.16" stroke-width="3"/>
+    <rect width="1200" height="630" fill="url(#moon)" mask="url(#crescent)"/>
+    <circle cx="448" cy="232" r="4" fill="#eef0fb"/>
+    <circle cx="486" cy="372" r="3" fill="#eef0fb" fill-opacity="0.85"/>
+  </g>
+
+  <!-- アプリ名・タグライン -->
+  <g font-family="'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP',Meiryo,system-ui,sans-serif">
+    <text x="610" y="276" fill="url(#title)" font-size="92" font-weight="700" letter-spacing="4">心の平穏</text>
+    <text x="614" y="338" fill="#8b9dff" font-size="34" font-weight="600" letter-spacing="10" text-transform="uppercase">KOKORO NO HEION</text>
+    <line x1="614" y1="372" x2="1090" y2="372" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.5"/>
+    <text x="614" y="426" fill="#b3b8d8" font-size="36" font-weight="400">ヒーリングと瞑想で、心にやすらぎを</text>
+  </g>
+</svg>

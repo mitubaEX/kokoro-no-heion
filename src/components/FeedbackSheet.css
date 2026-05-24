@@ -1,0 +1,220 @@
+/* フィードバックシート — 夜空テーマに調和したモーダル */
+
+/* 背景オーバーレイ */
+.fb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  padding: 16px;
+
+  background: rgba(8, 10, 24, 0.6);
+  backdrop-filter: blur(4px);
+
+  animation: fb-fade 0.2s ease both;
+}
+
+/* シート本体 */
+.fb-sheet {
+  width: 100%;
+  max-width: var(--maxw);
+  max-height: 88vh;
+  overflow-y: auto;
+
+  padding: 22px;
+
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+
+  animation: fb-rise 0.26s ease both;
+}
+
+/* 中央寄りの広い画面ではボトムシートではなく中央モーダル風に */
+@media (min-width: 600px) {
+  .fb-overlay {
+    align-items: center;
+  }
+  .fb-sheet {
+    max-width: 520px;
+  }
+}
+
+/* ヘッダ（アプリ名＋閉じる） */
+.fb-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fb-title h2 {
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+.fb-version {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.fb-close {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.fb-close:hover {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.fb-update {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+/* 入力フォーム */
+.fb-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.fb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fb-label {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+/* カテゴリチップ */
+.fb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fb-chip {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.fb-chip:hover {
+  background: var(--surface-strong);
+}
+.fb-chip.is-active {
+  color: #0c1024;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  font-weight: 600;
+}
+
+/* テキストエリア */
+.fb-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 96px;
+  padding: 12px 14px;
+
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text);
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  transition: border-color 0.2s ease;
+}
+.fb-textarea::placeholder {
+  color: var(--text-faint);
+}
+.fb-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.fb-textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.fb-submit {
+  align-self: flex-start;
+}
+
+/* 送信完了 */
+.fb-thanks {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.fb-thanks p {
+  font-size: 0.92rem;
+  color: var(--text-dim);
+}
+.fb-again {
+  font-size: 0.84rem;
+  padding: 9px 16px;
+}
+
+/* プライバシー注記 */
+.fb-privacy {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 0.76rem;
+  color: var(--text-faint);
+}
+
+@keyframes fb-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* reduced-motion 時はアニメ無しで静かに表示 */
+@media (prefers-reduced-motion: reduce) {
+  .fb-overlay,
+  .fb-sheet {
+    animation: none;
+  }
+}

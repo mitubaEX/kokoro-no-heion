@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="心の平穏 アプリアイコン">
+  <defs>
+    <!-- 夜空の背景グラデーション -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1d3a"/>
+      <stop offset="1" stop-color="#0f1124"/>
+    </linearGradient>
+    <!-- 中央の静かな光（同心円のための放射グラデ） -->
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#8b9dff" stop-opacity="0.30"/>
+      <stop offset="0.55" stop-color="#6ad3c4" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#6ad3c4" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 三日月のグラデーション -->
+    <linearGradient id="moon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b9dff"/>
+      <stop offset="1" stop-color="#6ad3c4"/>
+    </linearGradient>
+    <!-- 三日月を作るためのマスク（満月から影の円を抜く） -->
+    <mask id="crescent">
+      <rect width="512" height="512" fill="black"/>
+      <circle cx="256" cy="256" r="86" fill="white"/>
+      <circle cx="298" cy="232" r="78" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- 背景：マスカブル対応で全面塗り -->
+  <rect width="512" height="512" fill="url(#sky)"/>
+
+  <!-- ここから下のモチーフは中央 80%（約 51〜461）に収める -->
+
+  <!-- 中央の静かな光 -->
+  <circle cx="256" cy="256" r="170" fill="url(#halo)"/>
+
+  <!-- 同心円（水面の波紋／落ち着きのリング） -->
+  <g fill="none" stroke-linecap="round">
+    <circle cx="256" cy="256" r="150" stroke="#8b9dff" stroke-opacity="0.18" stroke-width="2"/>
+    <circle cx="256" cy="256" r="120" stroke="#6ad3c4" stroke-opacity="0.22" stroke-width="2"/>
+    <circle cx="256" cy="256" r="96" stroke="#8b9dff" stroke-opacity="0.28" stroke-width="2"/>
+  </g>
+
+  <!-- 三日月 -->
+  <g mask="url(#crescent)">
+    <rect x="120" y="120" width="280" height="280" fill="url(#moon)"/>
+  </g>
+
+  <!-- ささやかな星々（中央 80% 内に配置） -->
+  <g fill="#8b9dff">
+    <circle cx="160" cy="170" r="3.2" opacity="0.85"/>
+    <circle cx="350" cy="330" r="2.6" opacity="0.7"/>
+    <circle cx="180" cy="350" r="2.4" opacity="0.6"/>
+  </g>
+  <g fill="#6ad3c4">
+    <circle cx="345" cy="180" r="2.8" opacity="0.8"/>
+    <circle cx="200" cy="300" r="2.2" opacity="0.55"/>
+  </g>
+</svg>

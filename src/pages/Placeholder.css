@@ -1,0 +1,35 @@
+.placeholder {
+  text-align: center;
+  padding: 48px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.placeholder .ph-ico {
+  font-size: 3rem;
+  opacity: 0.85;
+}
+.placeholder .ph-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-width: 420px;
+  width: 100%;
+}
+.placeholder .ph-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.86rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.placeholder .ph-item .dot {
+  color: var(--accent);
+}
