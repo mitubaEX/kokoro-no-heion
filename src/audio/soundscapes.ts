@@ -51,7 +51,7 @@ const waves: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.9
+    root.gain.value = 0.55 // 0.9 → 0.55 で全体的に小さく
     // 薄いリバーブで「砂浜の広がり」を演出
     const verb = createReverbSend(ctx, out, { wet: 0.22, seconds: 1.8, decay: 2.4 })
     root.connect(verb.input)
@@ -65,11 +65,12 @@ const waves: Soundscape = {
     lp.Q.value = 0.6
 
     // 波の打ち寄せ — 2 系統の LFO を重ねて「うねりのうねり」を作る
+    // LFO 0.09→0.07Hz でよりゆったり、depth 0.28→0.22 で揺らぎを穏やかに
     const swell = ctx.createGain()
     swell.gain.value = 0.25
-    c.osc(attachLFO(ctx, swell.gain, 0.09, 0.32, 0.28))
-    c.osc(attachLFO(ctx, swell.gain, 0.023, 0, 0.04)) // ごく遅い揺らぎ
-    c.osc(attachLFO(ctx, lp.frequency, 0.09, 520, 320))
+    c.osc(attachLFO(ctx, swell.gain, 0.07, 0.28, 0.22))
+    c.osc(attachLFO(ctx, swell.gain, 0.019, 0, 0.03)) // ごく遅い揺らぎ
+    c.osc(attachLFO(ctx, lp.frequency, 0.07, 500, 260))
 
     src.connect(lp).connect(swell).connect(root)
     return {
@@ -96,7 +97,7 @@ const rain: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.55
+    root.gain.value = 0.40 // 0.55 → 0.40 で全体的に小さく
     root.connect(out)
 
     const src = startNoise(ctx, createNoiseBuffer(ctx, 'pink'))
@@ -118,6 +119,7 @@ const rain: Soundscape = {
     src.connect(hp).connect(lp).connect(flutter).connect(root)
 
     // 雨粒 — 短いバンドパスノイズバーストを不規則間隔で散らす
+    // 粒のピーク・間隔ともに穏やかにして「やさしい雨」らしく
     const dropBuf = createNoiseBuffer(ctx, 'white', 0.3)
     const dropOne = () => {
       const now = ctx.currentTime
@@ -128,7 +130,8 @@ const rain: Soundscape = {
       bp.frequency.value = 2200 + Math.random() * 1800
       bp.Q.value = 5
       const g = ctx.createGain()
-      const peak = 0.04 + Math.random() * 0.05
+      // ピーク 0.04-0.09 → 0.025-0.05 に
+      const peak = 0.025 + Math.random() * 0.025
       g.gain.setValueAtTime(0.0001, now)
       g.gain.exponentialRampToValueAtTime(peak, now + 0.004)
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.07 + Math.random() * 0.05)
@@ -140,7 +143,8 @@ const rain: Soundscape = {
     let dropTimer: ReturnType<typeof setTimeout>
     const scheduleDrop = () => {
       dropOne()
-      dropTimer = setTimeout(scheduleDrop, 40 + Math.random() * 120)
+      // 40-160ms → 120-340ms で密度を下げる
+      dropTimer = setTimeout(scheduleDrop, 120 + Math.random() * 220)
     }
     scheduleDrop()
     c.add(() => clearTimeout(dropTimer))
@@ -163,8 +167,8 @@ const bowl: Soundscape = {
     // たっぷり長いリバーブで「お堂の中」のような響き
     const verb = createReverbSend(ctx, out, { wet: 0.45, seconds: 2.6, decay: 1.8 })
     root.connect(verb.input)
-    // 立ち上がりをやわらかく
-    root.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + 4)
+    // 立ち上がりをよりやわらかく（4s → 6s、到達ゲイン 0.5 → 0.32）
+    root.gain.exponentialRampToValueAtTime(0.32, ctx.currentTime + 6)
 
     // ボウルの倍音（やや非整数倍で金属的な響き）
     const fundamental = 196 // G3 あたり
@@ -212,7 +216,8 @@ const pad: Soundscape = {
     // 最も強めのリバーブで星空のような奥行きを
     const verb = createReverbSend(ctx, out, { wet: 0.55, seconds: 3.0, decay: 1.6 })
     root.connect(verb.input)
-    root.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 5)
+    // 立ち上がり 5s → 8s、到達ゲイン 0.4 → 0.28 でよりゆったり静かに
+    root.gain.exponentialRampToValueAtTime(0.28, ctx.currentTime + 8)
 
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
@@ -263,7 +268,7 @@ const forest: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.5
+    root.gain.value = 0.35 // 0.5 → 0.35 で全体的に小さく
     // 薄めのリバーブで「森の中」感
     const verb = createReverbSend(ctx, out, { wet: 0.18, seconds: 1.4, decay: 2.5 })
     root.connect(verb.input)
@@ -302,9 +307,9 @@ const forest: Soundscape = {
     leavesHp.type = 'highpass'
     leavesHp.frequency.value = 1800
     const leavesGain = ctx.createGain()
-    leavesGain.gain.value = 0.06
-    c.osc(attachLFO(ctx, leavesGain.gain, 0.13, 0.06, 0.05))
-    c.osc(attachLFO(ctx, leavesGain.gain, 0.043, 0, 0.02))
+    leavesGain.gain.value = 0.04 // 0.06 → 0.04 で控えめに
+    c.osc(attachLFO(ctx, leavesGain.gain, 0.11, 0.04, 0.035))
+    c.osc(attachLFO(ctx, leavesGain.gain, 0.037, 0, 0.015))
     leaves.connect(leavesHp).connect(leavesGain).connect(root)
 
     return {
@@ -331,7 +336,7 @@ const campfire: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.7
+    root.gain.value = 0.45 // 0.7 → 0.45 で全体的に小さく
     root.connect(out)
 
     // 炎のうなり — ブラウンノイズをローパスして低くこもらせる
@@ -342,8 +347,8 @@ const campfire: Soundscape = {
     lp.frequency.value = 420
     lp.Q.value = 0.5
     const bedGain = ctx.createGain()
-    bedGain.gain.value = 0.4
-    c.osc(attachLFO(ctx, bedGain.gain, 0.13, 0.4, 0.16))
+    bedGain.gain.value = 0.32 // 0.4 → 0.32 でうなりも穏やかに
+    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.32, 0.12))
     bed.connect(lp).connect(bedGain).connect(root)
 
     // 爆ぜる音（クラックル） — 短いノイズバーストを不定期に鳴らす
@@ -358,7 +363,8 @@ const campfire: Soundscape = {
       // 1200〜3000Hz → 1000〜2400Hz に下げ、耳に刺さるパチ感を抑える
       hp.frequency.value = 1000 + Math.random() * 1400
       const g = ctx.createGain()
-      const peak = 0.04 + Math.random() * 0.1
+      // ピーク 0.04-0.14 → 0.025-0.075 に抑えて穏やかに
+      const peak = 0.025 + Math.random() * 0.05
       g.gain.setValueAtTime(0.0001, now)
       // 立ち上がり 0.005 → 0.003 でより乾いた音に
       g.gain.exponentialRampToValueAtTime(peak, now + 0.003)
@@ -373,7 +379,8 @@ const campfire: Soundscape = {
     let crackleTimer: ReturnType<typeof setTimeout>
     const scheduleCrackle = () => {
       fireCrackle()
-      crackleTimer = setTimeout(scheduleCrackle, 120 + Math.random() * 420)
+      // 120-540ms → 280-900ms でぱちぱちの間隔を空ける
+      crackleTimer = setTimeout(scheduleCrackle, 280 + Math.random() * 620)
     }
     scheduleCrackle()
     c.add(() => clearTimeout(crackleTimer))
@@ -394,7 +401,8 @@ const whitenoise: Soundscape = {
     const root = ctx.createGain()
     root.gain.value = 0.0001
     root.connect(out)
-    root.gain.exponentialRampToValueAtTime(0.45, ctx.currentTime + 3)
+    // 到達ゲイン 0.45 → 0.30、立ち上がり 3s → 5s でゆったり静かに
+    root.gain.exponentialRampToValueAtTime(0.30, ctx.currentTime + 5)
 
     // ホワイト → ピンクで低域寄り、耳当たりが柔らかい
     const src = startNoise(ctx, createNoiseBuffer(ctx, 'pink'))
@@ -425,7 +433,7 @@ const crickets: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.5
+    root.gain.value = 0.32 // 0.5 → 0.32 で全体的に小さく
     root.connect(out)
 
     // 夜の空気感 — ごく低いブラウンノイズの底
@@ -435,7 +443,7 @@ const crickets: Soundscape = {
     airLp.type = 'lowpass'
     airLp.frequency.value = 300
     const airGain = ctx.createGain()
-    airGain.gain.value = 0.12
+    airGain.gain.value = 0.08 // 0.12 → 0.08 で夜の底もより静かに
     air.connect(airLp).connect(airGain).connect(root)
 
     // 鈴虫のすだき — 高めの三角波をトレモロで細かく刻む
@@ -460,9 +468,10 @@ const crickets: Soundscape = {
       c.osc(osc)
     }
     // 数匹ぶんを少しずつ違う高さ・テンポ・位置で重ねる
-    chirp(4200, 22, 0.05, -0.4)
-    chirp(4600, 19, 0.04, 0.45)
-    chirp(3900, 25, 0.035, -0.05)
+    // トレモロ速度 22/19/25 → 18/16/20、レベルも控えめにしてゆったり穏やかに
+    chirp(4200, 18, 0.035, -0.4)
+    chirp(4600, 16, 0.028, 0.45)
+    chirp(3900, 20, 0.025, -0.05)
 
     return { dispose: () => c.dispose(root) }
   },
