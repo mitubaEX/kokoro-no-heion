@@ -347,9 +347,9 @@ const campfire: Soundscape = {
     lp.frequency.value = 420
     lp.Q.value = 0.5
     const bedGain = ctx.createGain()
-    // 「ゴー」という炎のうなりを 0.4 → 0.32 → 0.18 → 0.08 とごく控えめに
-    bedGain.gain.value = 0.08
-    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.08, 0.03))
+    // 「ゴー」という炎のうなりは雰囲気作りの最小限まで絞る（0.08 → 0.035）
+    bedGain.gain.value = 0.035
+    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.035, 0.012))
     bed.connect(lp).connect(bedGain).connect(root)
 
     // 爆ぜる音（クラックル） — 短いノイズバーストを不定期に鳴らす
