@@ -1,4 +1,5 @@
 import { attachLFO, createNoiseBuffer, startNoise } from './noise'
+import { createReverbSend } from './reverb'
 
 /** 生成済みのサウンドスケープ。dispose で全ノードを停止・破棄する。 */
 export interface Voice {
@@ -51,25 +52,37 @@ const waves: Soundscape = {
     const c = collector()
     const root = ctx.createGain()
     root.gain.value = 0.9
-    root.connect(out)
+    // 薄いリバーブで「砂浜の広がり」を演出
+    const verb = createReverbSend(ctx, out, { wet: 0.22, seconds: 1.8, decay: 2.4 })
+    root.connect(verb.input)
 
     const src = startNoise(ctx, createNoiseBuffer(ctx, 'brown'))
     c.src(src)
 
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 600
+    lp.frequency.value = 480 // 600 → 480Hz で耳当たりを柔らかく
     lp.Q.value = 0.6
 
-    // 波の打ち寄せ — ゆっくりとした音量のうねり
+    // 波の打ち寄せ — 2 系統の LFO を重ねて「うねりのうねり」を作る
     const swell = ctx.createGain()
     swell.gain.value = 0.25
     c.osc(attachLFO(ctx, swell.gain, 0.09, 0.32, 0.28))
-    // フィルタも一緒に開閉させて「ザー」と「サー」を作る
-    c.osc(attachLFO(ctx, lp.frequency, 0.09, 650, 350))
+    c.osc(attachLFO(ctx, swell.gain, 0.023, 0, 0.04)) // ごく遅い揺らぎ
+    c.osc(attachLFO(ctx, lp.frequency, 0.09, 520, 320))
 
     src.connect(lp).connect(swell).connect(root)
-    return { dispose: () => c.dispose(root) }
+    return {
+      dispose: () => {
+        c.dispose(root)
+        try {
+          verb.input.disconnect()
+          verb.convolver.disconnect()
+        } catch {
+          /* noop */
+        }
+      },
+    }
   },
 }
 
@@ -95,7 +108,7 @@ const rain: Soundscape = {
 
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 5500
+    lp.frequency.value = 4500 // 5500 → 4500Hz で耳に刺さる高域を抑制
 
     // 細かなゆらぎ
     const flutter = ctx.createGain()
@@ -103,6 +116,35 @@ const rain: Soundscape = {
     c.osc(attachLFO(ctx, flutter.gain, 0.6, 0.5, 0.06))
 
     src.connect(hp).connect(lp).connect(flutter).connect(root)
+
+    // 雨粒 — 短いバンドパスノイズバーストを不規則間隔で散らす
+    const dropBuf = createNoiseBuffer(ctx, 'white', 0.3)
+    const dropOne = () => {
+      const now = ctx.currentTime
+      const s = ctx.createBufferSource()
+      s.buffer = dropBuf
+      const bp = ctx.createBiquadFilter()
+      bp.type = 'bandpass'
+      bp.frequency.value = 2200 + Math.random() * 1800
+      bp.Q.value = 5
+      const g = ctx.createGain()
+      const peak = 0.04 + Math.random() * 0.05
+      g.gain.setValueAtTime(0.0001, now)
+      g.gain.exponentialRampToValueAtTime(peak, now + 0.004)
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.07 + Math.random() * 0.05)
+      s.connect(bp).connect(g).connect(root)
+      const offset = Math.random() * 0.2
+      s.start(now, offset, 0.12)
+      s.stop(now + 0.18)
+    }
+    let dropTimer: ReturnType<typeof setTimeout>
+    const scheduleDrop = () => {
+      dropOne()
+      dropTimer = setTimeout(scheduleDrop, 40 + Math.random() * 120)
+    }
+    scheduleDrop()
+    c.add(() => clearTimeout(dropTimer))
+
     return { dispose: () => c.dispose(root) }
   },
 }
@@ -118,7 +160,9 @@ const bowl: Soundscape = {
     const c = collector()
     const root = ctx.createGain()
     root.gain.value = 0.0001
-    root.connect(out)
+    // たっぷり長いリバーブで「お堂の中」のような響き
+    const verb = createReverbSend(ctx, out, { wet: 0.45, seconds: 2.6, decay: 1.8 })
+    root.connect(verb.input)
     // 立ち上がりをやわらかく
     root.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + 4)
 
@@ -130,16 +174,27 @@ const bowl: Soundscape = {
       const osc = ctx.createOscillator()
       osc.type = 'sine'
       osc.frequency.value = fundamental * mult
+      // 倍音ごとに僅かにデチューンしてうねりを自然に
+      osc.detune.value = (i - 1.5) * 2.2
       const g = ctx.createGain()
       g.gain.value = gains[i]
-      // 各倍音をわずかに揺らして「うなり」を出す
       c.osc(attachLFO(ctx, g.gain, 0.05 + i * 0.013, gains[i], gains[i] * 0.5))
       osc.connect(g).connect(root)
       osc.start()
       c.osc(osc)
     })
 
-    return { dispose: () => c.dispose(root) }
+    return {
+      dispose: () => {
+        c.dispose(root)
+        try {
+          verb.input.disconnect()
+          verb.convolver.disconnect()
+        } catch {
+          /* noop */
+        }
+      },
+    }
   },
 }
 
@@ -154,36 +209,47 @@ const pad: Soundscape = {
     const c = collector()
     const root = ctx.createGain()
     root.gain.value = 0.0001
-    root.connect(out)
+    // 最も強めのリバーブで星空のような奥行きを
+    const verb = createReverbSend(ctx, out, { wet: 0.55, seconds: 3.0, decay: 1.6 })
+    root.connect(verb.input)
     root.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + 5)
 
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 1200
+    lp.frequency.value = 1100 // sawtooth から triangle に変えたので少し下げる
     lp.Q.value = 0.8
-    // ゆっくり開閉するフィルタ
-    c.osc(attachLFO(ctx, lp.frequency, 0.03, 1100, 700))
+    c.osc(attachLFO(ctx, lp.frequency, 0.03, 1000, 600))
     lp.connect(root)
 
     // A メジャー系のやわらかい和音
     const notes = [110, 164.81, 220, 277.18] // A2, E3, A3, C#4
     notes.forEach((freq, i) => {
-      // 各音を 2 つのオシレータでわずかにデチューンして厚みを出す
       ;[-1, 1].forEach((dir) => {
         const osc = ctx.createOscillator()
-        osc.type = 'sawtooth'
+        // sawtooth → triangle で倍音を減らしノイズ感を低減
+        osc.type = 'triangle'
         osc.frequency.value = freq
         osc.detune.value = dir * (4 + i)
         const g = ctx.createGain()
-        g.gain.value = 0.06
-        c.osc(attachLFO(ctx, g.gain, 0.02 + i * 0.01, 0.06, 0.03))
+        g.gain.value = 0.08
+        c.osc(attachLFO(ctx, g.gain, 0.02 + i * 0.01, 0.08, 0.04))
         osc.connect(g).connect(lp)
         osc.start()
         c.osc(osc)
       })
     })
 
-    return { dispose: () => c.dispose(root) }
+    return {
+      dispose: () => {
+        c.dispose(root)
+        try {
+          verb.input.disconnect()
+          verb.convolver.disconnect()
+        } catch {
+          /* noop */
+        }
+      },
+    }
   },
 }
 
@@ -198,9 +264,11 @@ const forest: Soundscape = {
     const c = collector()
     const root = ctx.createGain()
     root.gain.value = 0.5
-    root.connect(out)
+    // 薄めのリバーブで「森の中」感
+    const verb = createReverbSend(ctx, out, { wet: 0.18, seconds: 1.4, decay: 2.5 })
+    root.connect(verb.input)
 
-    // せせらぎ — 高めにフィルタした水のノイズ
+    // せせらぎ — 高めにフィルタした水のノイズ、左寄りにパン
     const stream = startNoise(ctx, createNoiseBuffer(ctx, 'white'))
     c.src(stream)
     const bp = ctx.createBiquadFilter()
@@ -210,9 +278,11 @@ const forest: Soundscape = {
     c.osc(attachLFO(ctx, bp.frequency, 0.8, 2500, 600))
     const streamGain = ctx.createGain()
     streamGain.gain.value = 0.18
-    stream.connect(bp).connect(streamGain).connect(root)
+    const streamPan = ctx.createStereoPanner()
+    streamPan.pan.value = -0.35
+    stream.connect(bp).connect(streamGain).connect(streamPan).connect(root)
 
-    // 木々のそよぎ — 低めのノイズをゆっくりうねらせる
+    // 木々のそよぎ — 低めのノイズをゆっくりうねらせる、右寄りにパン
     const wind = startNoise(ctx, createNoiseBuffer(ctx, 'brown'))
     c.src(wind)
     const lp = ctx.createBiquadFilter()
@@ -221,9 +291,33 @@ const forest: Soundscape = {
     const windGain = ctx.createGain()
     windGain.gain.value = 0.2
     c.osc(attachLFO(ctx, windGain.gain, 0.07, 0.2, 0.14))
-    wind.connect(lp).connect(windGain).connect(root)
+    const windPan = ctx.createStereoPanner()
+    windPan.pan.value = 0.3
+    wind.connect(lp).connect(windGain).connect(windPan).connect(root)
 
-    return { dispose: () => c.dispose(root) }
+    // 葉ずれ — 高域ブラウンノイズの 2 重 LFO で自然な揺らぎ
+    const leaves = startNoise(ctx, createNoiseBuffer(ctx, 'brown'))
+    c.src(leaves)
+    const leavesHp = ctx.createBiquadFilter()
+    leavesHp.type = 'highpass'
+    leavesHp.frequency.value = 1800
+    const leavesGain = ctx.createGain()
+    leavesGain.gain.value = 0.06
+    c.osc(attachLFO(ctx, leavesGain.gain, 0.13, 0.06, 0.05))
+    c.osc(attachLFO(ctx, leavesGain.gain, 0.043, 0, 0.02))
+    leaves.connect(leavesHp).connect(leavesGain).connect(root)
+
+    return {
+      dispose: () => {
+        c.dispose(root)
+        try {
+          verb.input.disconnect()
+          verb.convolver.disconnect()
+        } catch {
+          /* noop */
+        }
+      },
+    }
   },
 }
 
@@ -249,7 +343,6 @@ const campfire: Soundscape = {
     lp.Q.value = 0.5
     const bedGain = ctx.createGain()
     bedGain.gain.value = 0.4
-    // ゆっくりとした炎のゆらめき
     c.osc(attachLFO(ctx, bedGain.gain, 0.13, 0.4, 0.16))
     bed.connect(lp).connect(bedGain).connect(root)
 
@@ -259,22 +352,24 @@ const campfire: Soundscape = {
       const now = ctx.currentTime
       const src = ctx.createBufferSource()
       src.buffer = crackleBuf
-      // バッファ内のランダムな位置から短く切り出す
       const offset = Math.random() * 0.9
       const hp = ctx.createBiquadFilter()
       hp.type = 'highpass'
-      hp.frequency.value = 1200 + Math.random() * 1800
+      // 1200〜3000Hz → 1000〜2400Hz に下げ、耳に刺さるパチ感を抑える
+      hp.frequency.value = 1000 + Math.random() * 1400
       const g = ctx.createGain()
-      // ぱちっと小さく立ち上がってすぐ減衰
       const peak = 0.04 + Math.random() * 0.1
       g.gain.setValueAtTime(0.0001, now)
-      g.gain.exponentialRampToValueAtTime(peak, now + 0.005)
+      // 立ち上がり 0.005 → 0.003 でより乾いた音に
+      g.gain.exponentialRampToValueAtTime(peak, now + 0.003)
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05 + Math.random() * 0.08)
-      src.connect(hp).connect(g).connect(root)
+      // ステレオに微妙に振り分けて立体感
+      const pan = ctx.createStereoPanner()
+      pan.pan.value = (Math.random() * 2 - 1) * 0.4
+      src.connect(hp).connect(g).connect(pan).connect(root)
       src.start(now, offset, 0.18)
       src.stop(now + 0.25)
     }
-    // 不規則なパチパチ感を出すため、毎回ランダム間隔で予約し直す
     let crackleTimer: ReturnType<typeof setTimeout>
     const scheduleCrackle = () => {
       fireCrackle()
@@ -299,19 +394,18 @@ const whitenoise: Soundscape = {
     const root = ctx.createGain()
     root.gain.value = 0.0001
     root.connect(out)
-    // 耳に刺さらないよう、ゆっくり立ち上げる
     root.gain.exponentialRampToValueAtTime(0.45, ctx.currentTime + 3)
 
-    const src = startNoise(ctx, createNoiseBuffer(ctx, 'white'))
+    // ホワイト → ピンクで低域寄り、耳当たりが柔らかい
+    const src = startNoise(ctx, createNoiseBuffer(ctx, 'pink'))
     c.src(src)
 
-    // 高域の刺激を抑えてやわらかく整える
+    // 高域を 6000 → 4500Hz でさらに丸める
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 6000
+    lp.frequency.value = 4500
     lp.Q.value = 0.4
 
-    // 低域の重さを少し削いで安定させる
     const hp = ctx.createBiquadFilter()
     hp.type = 'highpass'
     hp.frequency.value = 200
@@ -345,27 +439,30 @@ const crickets: Soundscape = {
     air.connect(airLp).connect(airGain).connect(root)
 
     // 鈴虫のすだき — 高めの三角波をトレモロで細かく刻む
-    const chirp = (base: number, rate: number, level: number) => {
+    // pan で左右に散らし、機械的な等間隔感を消すため僅かなテンポ揺らぎも入れる
+    const chirp = (base: number, rate: number, level: number, panValue: number) => {
       const osc = ctx.createOscillator()
       osc.type = 'triangle'
       osc.frequency.value = base
-      // バンドパスで虫らしい線の細い音色に
       const bp = ctx.createBiquadFilter()
       bp.type = 'bandpass'
       bp.frequency.value = base
       bp.Q.value = 6
-      // トレモロ用ゲート — 0 と level の間を素早く開閉して「リリリ」を作る
       const gate = ctx.createGain()
       gate.gain.value = 0
       c.osc(attachLFO(ctx, gate.gain, rate, level / 2, level / 2))
-      osc.connect(bp).connect(gate).connect(root)
+      // トレモロ速度自体もゆっくり揺らがせて自然に
+      c.osc(attachLFO(ctx, gate.gain, rate * 0.07, 0, level * 0.08))
+      const pan = ctx.createStereoPanner()
+      pan.pan.value = panValue
+      osc.connect(bp).connect(gate).connect(pan).connect(root)
       osc.start()
       c.osc(osc)
     }
-    // 数匹ぶんを少しずつ違う高さ・テンポで重ねる
-    chirp(4200, 22, 0.05)
-    chirp(4600, 19, 0.04)
-    chirp(3900, 25, 0.035)
+    // 数匹ぶんを少しずつ違う高さ・テンポ・位置で重ねる
+    chirp(4200, 22, 0.05, -0.4)
+    chirp(4600, 19, 0.04, 0.45)
+    chirp(3900, 25, 0.035, -0.05)
 
     return { dispose: () => c.dispose(root) }
   },
