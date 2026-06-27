@@ -65,11 +65,11 @@ const waves: Soundscape = {
     lp.Q.value = 0.6
 
     // 波の打ち寄せ — 2 系統の LFO を重ねて「うねりのうねり」を作る
-    // LFO 0.09→0.07Hz でよりゆったり、depth 0.28→0.22 で揺らぎを穏やかに
+    // 後ろの「ゴー」を焚き火のうなり並みまで下げる：base 0.25→0.11 / depth 0.22→0.10
     const swell = ctx.createGain()
-    swell.gain.value = 0.25
-    c.osc(attachLFO(ctx, swell.gain, 0.07, 0.28, 0.22))
-    c.osc(attachLFO(ctx, swell.gain, 0.019, 0, 0.03)) // ごく遅い揺らぎ
+    swell.gain.value = 0.11
+    c.osc(attachLFO(ctx, swell.gain, 0.07, 0.11, 0.10))
+    c.osc(attachLFO(ctx, swell.gain, 0.019, 0, 0.015)) // ごく遅い揺らぎも縮小
     c.osc(attachLFO(ctx, lp.frequency, 0.07, 500, 260))
 
     src.connect(lp).connect(swell).connect(root)
@@ -97,7 +97,7 @@ const rain: Soundscape = {
   build(ctx, out) {
     const c = collector()
     const root = ctx.createGain()
-    root.gain.value = 0.40 // 0.55 → 0.40 で全体的に小さく
+    root.gain.value = 0.22 // 0.40 → 0.22 でさらに小さく（小雨らしい静けさ）
     root.connect(out)
 
     const src = startNoise(ctx, createNoiseBuffer(ctx, 'pink'))
@@ -109,17 +109,17 @@ const rain: Soundscape = {
 
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 4500 // 5500 → 4500Hz で耳に刺さる高域を抑制
+    lp.frequency.value = 3600 // 4500 → 3600Hz で高域をさらに丸めシャー感を減らす
 
-    // 細かなゆらぎ
+    // 細かなゆらぎ — ベースのザー感を抑え、粒との対比を出す
     const flutter = ctx.createGain()
-    flutter.gain.value = 0.5
-    c.osc(attachLFO(ctx, flutter.gain, 0.6, 0.5, 0.06))
+    flutter.gain.value = 0.32
+    c.osc(attachLFO(ctx, flutter.gain, 0.6, 0.32, 0.04))
 
     src.connect(hp).connect(lp).connect(flutter).connect(root)
 
     // 雨粒 — 短いバンドパスノイズバーストを不規則間隔で散らす
-    // 粒のピーク・間隔ともに穏やかにして「やさしい雨」らしく
+    // 小雨らしくぽつ…ぽつ…と間隔を空けて粒も小さく
     const dropBuf = createNoiseBuffer(ctx, 'white', 0.3)
     const dropOne = () => {
       const now = ctx.currentTime
@@ -130,8 +130,8 @@ const rain: Soundscape = {
       bp.frequency.value = 2200 + Math.random() * 1800
       bp.Q.value = 5
       const g = ctx.createGain()
-      // ピーク 0.04-0.09 → 0.025-0.05 に
-      const peak = 0.025 + Math.random() * 0.025
+      // ピーク 0.025-0.05 → 0.012-0.024 に半減
+      const peak = 0.012 + Math.random() * 0.012
       g.gain.setValueAtTime(0.0001, now)
       g.gain.exponentialRampToValueAtTime(peak, now + 0.004)
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.07 + Math.random() * 0.05)
@@ -143,8 +143,8 @@ const rain: Soundscape = {
     let dropTimer: ReturnType<typeof setTimeout>
     const scheduleDrop = () => {
       dropOne()
-      // 40-160ms → 120-340ms → 240-680ms とさらに広げ、しとしと感を強める
-      dropTimer = setTimeout(scheduleDrop, 240 + Math.random() * 440)
+      // 240-680ms → 700-1900ms、小雨レベルの間隔（およそ 1 秒に 1 粒）
+      dropTimer = setTimeout(scheduleDrop, 700 + Math.random() * 1200)
     }
     scheduleDrop()
     c.add(() => clearTimeout(dropTimer))
@@ -288,14 +288,15 @@ const forest: Soundscape = {
     stream.connect(bp).connect(streamGain).connect(streamPan).connect(root)
 
     // 木々のそよぎ — 低めのノイズをゆっくりうねらせる、右寄りにパン
+    // 後ろの「ゴー」を焚き火のうなり並みまで下げる：base 0.2→0.06 / depth 0.14→0.04
     const wind = startNoise(ctx, createNoiseBuffer(ctx, 'brown'))
     c.src(wind)
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
     lp.frequency.value = 450
     const windGain = ctx.createGain()
-    windGain.gain.value = 0.2
-    c.osc(attachLFO(ctx, windGain.gain, 0.07, 0.2, 0.14))
+    windGain.gain.value = 0.06
+    c.osc(attachLFO(ctx, windGain.gain, 0.07, 0.06, 0.04))
     const windPan = ctx.createStereoPanner()
     windPan.pan.value = 0.3
     wind.connect(lp).connect(windGain).connect(windPan).connect(root)
