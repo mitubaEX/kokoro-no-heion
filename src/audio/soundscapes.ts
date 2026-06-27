@@ -339,18 +339,7 @@ const campfire: Soundscape = {
     root.gain.value = 0.45 // 0.7 → 0.45 で全体的に小さく
     root.connect(out)
 
-    // 炎のうなり — ブラウンノイズをローパスして低くこもらせる
-    const bed = startNoise(ctx, createNoiseBuffer(ctx, 'brown'))
-    c.src(bed)
-    const lp = ctx.createBiquadFilter()
-    lp.type = 'lowpass'
-    lp.frequency.value = 420
-    lp.Q.value = 0.5
-    const bedGain = ctx.createGain()
-    // 「ゴー」という炎のうなりを 0.4 → 0.32 → 0.18 → 0.08 とごく控えめに
-    bedGain.gain.value = 0.08
-    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.08, 0.03))
-    bed.connect(lp).connect(bedGain).connect(root)
+    // 炎のうなり（ゴー音）は完全にカット。クラックル（パチパチ）のみで焚き火を表現する。
 
     // 爆ぜる音（クラックル） — 短いノイズバーストを不定期に鳴らす
     const crackleBuf = createNoiseBuffer(ctx, 'white', 1)
