@@ -12,7 +12,7 @@ export interface EngineState {
   unlocked: boolean
 }
 
-const FADE_IN = 2.5
+const FADE_IN = 4.0
 const FADE_OUT = 1.0
 const TIMER_FADE = 8 // 就寝タイマー終了時のフェードアウト秒数
 
