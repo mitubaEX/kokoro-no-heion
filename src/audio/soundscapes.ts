@@ -143,8 +143,8 @@ const rain: Soundscape = {
     let dropTimer: ReturnType<typeof setTimeout>
     const scheduleDrop = () => {
       dropOne()
-      // 40-160ms → 120-340ms で密度を下げる
-      dropTimer = setTimeout(scheduleDrop, 120 + Math.random() * 220)
+      // 40-160ms → 120-340ms → 240-680ms とさらに広げ、しとしと感を強める
+      dropTimer = setTimeout(scheduleDrop, 240 + Math.random() * 440)
     }
     scheduleDrop()
     c.add(() => clearTimeout(dropTimer))
@@ -347,8 +347,9 @@ const campfire: Soundscape = {
     lp.frequency.value = 420
     lp.Q.value = 0.5
     const bedGain = ctx.createGain()
-    bedGain.gain.value = 0.32 // 0.4 → 0.32 でうなりも穏やかに
-    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.32, 0.12))
+    // 「ゴー」という炎のうなりを 0.4 → 0.32 → 0.18 とさらに小さく
+    bedGain.gain.value = 0.18
+    c.osc(attachLFO(ctx, bedGain.gain, 0.10, 0.18, 0.07))
     bed.connect(lp).connect(bedGain).connect(root)
 
     // 爆ぜる音（クラックル） — 短いノイズバーストを不定期に鳴らす
@@ -379,8 +380,8 @@ const campfire: Soundscape = {
     let crackleTimer: ReturnType<typeof setTimeout>
     const scheduleCrackle = () => {
       fireCrackle()
-      // 120-540ms → 280-900ms でぱちぱちの間隔を空ける
-      crackleTimer = setTimeout(scheduleCrackle, 280 + Math.random() * 620)
+      // 120-540ms → 280-900ms → 560-1800ms とさらに広げ、ゆったりとした炎に
+      crackleTimer = setTimeout(scheduleCrackle, 560 + Math.random() * 1240)
     }
     scheduleCrackle()
     c.add(() => clearTimeout(crackleTimer))
